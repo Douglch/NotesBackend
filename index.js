@@ -7,7 +7,7 @@ const express = require("express");
 const app = express();
 // Allows cross server and data references
 const cors = require("cors");
-// Sets the database and server environment to run from 
+// Sets the database and server environment to run from
 require("dotenv").config();
 app.use(express.json());
 app.use(cors());
@@ -56,35 +56,34 @@ app.get("/api/notes", (request, response) => {
 });
 
 // Fetching individual notes by id
-app.get('/api/notes/:id', (request, response) => {
-  Note.findById(request.params.id).then(note => {
-    response.json(note)
-  })
+app.get("/api/notes/:id", (request, response) => {
+  Note.findById(request.params.id).then((note) => {
+    response.json(note);
+  });
 });
 
 // Deleting data as a user, try doing it through postman
-// app.delete("/api/notes/:id", (request, response) => {
-//   const id = Number(request.params.id);
-//   notes = notes.filter((note) => note.id !== id);
-
-//   response.status(204).end();
-// });
+app.delete("/api/notes/:id", (request, response) => {
+  Note.findByIdAndDelete(request.params.id).then((note) => {
+    response.json(note);
+  });
+});
 
 // Adding notes
 app.post("/api/notes", (request, response) => {
   const body = request.body;
   if (body.content === undefined) {
-    return response.status(400).json({ error: 'content missing' })
+    return response.status(400).json({ error: "content missing" });
   }
   const note = new Note({
     content: body.content,
     important: body.important || false,
     date: new Date(),
-  })
+  });
 
-  note.save().then(savedNote => {
-    response.json(savedNote)
-  })
+  note.save().then((savedNote) => {
+    response.json(savedNote);
+  });
 });
 
 // Shows a 404 error for a note with unknown id
