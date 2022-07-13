@@ -1,10 +1,21 @@
+/* procfile tells Heroku how to start the application.
+   dependencies are done with npm install {dependency here}
+*/
+
 // Importing express as express
 const express = require("express");
 const app = express();
-const cors = require('cors');
+// Allows cross server and data references
+const cors = require("cors");
+// Sets the database and server environment to run from 
+require("dotenv").config();
 app.use(express.json());
 app.use(cors());
-app.use(express.static('build'));
+// Frontend production build import
+app.use(express.static("build"));
+
+// Import note model
+const Note = require("./models/note");
 
 let notes = [
   {
@@ -32,13 +43,16 @@ const generateId = () => {
   return maxId + 1;
 };
 
-// "/" = application's root directory
+// "/" = application's root directory -> displays main page
 app.get("/", (request, response) => {
   response.send("<h1>Hello World!</h1>");
 });
 
+// displays notes from mongodb
 app.get("/api/notes", (request, response) => {
-  response.json(notes);
+  Note.find({}).then((notes) => {
+    response.json(notes);
+  });
 });
 
 // Fetching data as a user
@@ -60,6 +74,7 @@ app.delete("/api/notes/:id", (request, response) => {
   response.status(204).end();
 });
 
+// Adding notes
 app.post("/api/notes", (request, response) => {
   const body = request.body;
   if (!body.content) {
@@ -80,14 +95,17 @@ app.post("/api/notes", (request, response) => {
   response.json(note);
 });
 
+// Shows a 404 error for a note with unknown id
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
 
 app.use(unknownEndpoint);
 
-const PORT = process.env.PORT || 3001
+// Port uses 3001 as set in .env
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  // ...notes.map(..) -> spread operator converts array to num
   console.log(...notes.map((n) => n.id));
 });
