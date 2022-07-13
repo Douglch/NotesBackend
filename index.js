@@ -38,10 +38,10 @@ const Note = require("./models/note");
 //   },
 // ];
 
-const generateId = () => {
-  const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
-  return maxId + 1;
-};
+// const generateId = () => {
+//   const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
+//   return maxId + 1;
+// };
 
 // "/" = application's root directory -> displays main page
 app.get("/", (request, response) => {
@@ -63,12 +63,12 @@ app.get('/api/notes/:id', (request, response) => {
 });
 
 // Deleting data as a user, try doing it through postman
-app.delete("/api/notes/:id", (request, response) => {
-  const id = Number(request.params.id);
-  notes = notes.filter((note) => note.id !== id);
+// app.delete("/api/notes/:id", (request, response) => {
+//   const id = Number(request.params.id);
+//   notes = notes.filter((note) => note.id !== id);
 
-  response.status(204).end();
-});
+//   response.status(204).end();
+// });
 
 // Adding notes
 app.post("/api/notes", (request, response) => {
@@ -99,5 +99,5 @@ const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   // ...notes.map(..) -> spread operator converts array to num
-  console.log(...notes.map((n) => n.id));
+  // console.log(...notes.map((n) => n.id));
 });
