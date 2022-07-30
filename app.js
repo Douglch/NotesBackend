@@ -1,12 +1,15 @@
+// Dictates default port and URI
+const config = require('./utils/config')
 // Importing express as express
 const express = require('express')
 const app = express()
+// refactor the code to eliminate catch from try-catch methods
+require('express-async-errors')
 // Allows cross server and data references
 const cors = require('cors')
-// Dictates default port and URI
-const config = require('./utils/config')
 // Controller import
-const notesRouter = require('./controllers/notes')
+const notesRouter = require('./controllers/note')
+const usersRouter = require('./controllers/users')
 // Custom error handler
 const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
@@ -28,7 +31,8 @@ app.use(express.static('build'))
 app.use(express.json())
 app.use(middleware.requestLogger)
 
-app.use('/api/notes', notesRouter)
+app.use('/', notesRouter)
+app.use('/api/users', usersRouter)
 
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)

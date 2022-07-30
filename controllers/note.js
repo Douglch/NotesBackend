@@ -1,6 +1,8 @@
 const notesRouter = require('express').Router()
 // Import note model
-const Note = require('./models/note')
+const Note = require('../models/note')
+// Import user model
+const User = require('../models/users')
 
 // "/" = application's root directory -> displays main page
 notesRouter.get('/', (request, response) => {
@@ -8,7 +10,7 @@ notesRouter.get('/', (request, response) => {
 })
 
 // displays notes from mongodb
-notesRouter.get('/api/notes', (request, response) => {
+notesRouter.get('/api/notes', async (request, response) => {
     Note.find({}).then((notes) => {
         response.json(notes)
     })
@@ -32,17 +34,17 @@ notesRouter.get('/api/notes/:id', (request, response, next) => {
 })
 
 // Deleting data as a user, try doing it through postman
-notesRouter.delete('/api/notes/:id', (request, response, next) => {
-    Note.findByIdAndRemove(request.params.id)
-        .then(() => {
-            response.status(204).end()
-        })
-        .catch((error) => next(error))
+notesRouter.delete('/api/notes/:id', async (request, response) => {
+    await Note.findByIdAndRemove(request.params.id)
+    response.status(204).end()
 })
 
 // Adding notes
-notesRouter.post('/api/notes', (request, response, next) => {
+notesRouter.post('/api/notes', async (request, response) => {
     const body = request.body
+
+    const user = await User.findById(body.userId)
+
     if (body.content === undefined) {
         return response.status(400).json({ error: 'content missing' })
     }
@@ -50,14 +52,12 @@ notesRouter.post('/api/notes', (request, response, next) => {
         content: body.content,
         important: body.important || false,
         date: new Date(),
+        user: user._id,
     })
 
-    note
-        .save()
-        .then((savedNote) => {
-            response.json(savedNote)
-        })
-        .catch((err) => next(err))
+    const savedNote = await note.save()
+    user.notes = user.notes.concat(savedNote._id)
+    response.status(201).json(savedNote)
 })
 
 // Updating notes
@@ -74,3 +74,5 @@ notesRouter.put('/api/:id', (request, response, next) => {
         })
         .catch((err) => next(err))
 })
+
+module.exports = notesRouter

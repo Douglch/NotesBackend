@@ -2,10 +2,10 @@
    dependencies are done with npm install {dependency here}
 */
 
-const app = require('app')
+const app = require('./app')
 const http = require('http')
-const config = require('config')
-const logger = require('logger')
+const config = require('./utils/config')
+const logger = require('./utils/logger')
 
 const server = http.createServer(app)
 
